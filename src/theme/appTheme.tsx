@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
         gap: 10
     },
     button: {
-        marginTop:30,
+        marginTop: 30,
         backgroundColor: PRIMARY_COLOR,
         paddingVertical: 15,
         borderRadius: 10
@@ -47,11 +47,18 @@ export const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center'
     },
-    iconPassword:{
-        position:'absolute',
-        right:20,
-        zIndex:1,
-        marginTop:20
+    iconPassword: {
+        position: 'absolute',
+        right: 20,
+        zIndex: 1,
+        marginTop: 20
+    },
+    textRedirection: {
+        color: PRIMARY_COLOR,
+        marginTop: 30,
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center'
     }
 
 })

@@ -11,17 +11,23 @@ interface Props {
     name: string;
     isPassword?: boolean;  //propiedad opcional
     hasIcon?: boolean;
+    accionIcon?: () => void;
 }
 
-export const InputComponent = ({ placeholder, handleSetValues, name, isPassword = false }: Props) => {
+export const InputComponent = ({ placeholder, handleSetValues, name, isPassword = false, hasIcon = false, accionIcon }: Props) => {
 
     return (
         <View>
-            <Icon
-                name='visibility'
-                size={23}
-                color={PRIMARY_COLOR}
-                style={styles.iconPassword} />
+            {
+                (hasIcon)
+                    ? <Icon
+                        name='visibility'
+                        size={23}
+                        color={PRIMARY_COLOR}
+                        onPress={accionIcon}
+                        style={styles.iconPassword} />
+                    : null
+            }
             <TextInput
                 placeholder={placeholder}
                 keyboardType='default'

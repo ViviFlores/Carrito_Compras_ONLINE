@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, StatusBar, Text, TouchableOpacity, View } from 'react-native';
-import { TitleComponent } from '../components/TitleComponent';
 import { PRIMARY_COLOR } from '../commons/constants';
+import { TitleComponent } from '../components/TitleComponent';
 import { BodyComponent } from '../components/BodyComponent';
 import { styles } from '../theme/appTheme';
 import { InputComponent } from '../components/InputComponent';
@@ -9,21 +9,22 @@ import { ButtonComponent } from '../components/ButtonComponent';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { User } from '../navigator/StackNavigator';
 
-
 //interface - props
 interface Props {
     users: User[];  //arreglo con la lista de usuarios
+    handleAddUser: (user: User) => void;  //función para agregar usuarios al arreglo
 }
 
-//interface - formulario Login
-interface FormLogin {
+//interface - formulario Registro
+interface FormRegister {
     email: string;
     password: string;
 }
 
-export const LoginScreen = ({ users }: Props) => {
-    //hook useState: cambiar el estado del formulario
-    const [formLogin, setFormLogin] = useState<FormLogin>({
+export const RegisterScreen = ({ users, handleAddUser }: Props) => {
+
+    //hook useState: manipular el estado del formulario
+    const [formRegister, setFormRegister] = useState<FormRegister>({
         email: '',
         password: ''
     });
@@ -31,19 +32,18 @@ export const LoginScreen = ({ users }: Props) => {
     //hook useState: manipular la visualización o no del password
     const [hiddenPassword, setHiddenPassword] = useState<boolean>(true);
 
-    //hook useNavigation: navegar de una pantalla a otra
+    //hook useNavigation: permite navgar de una pantalla a otra
     const navigation = useNavigation();
 
     //función actualizar el estado del formulario
     const handleSetValues = (name: string, value: string) => {
-        //...operador de propagación | spread: sacar una copia de las propiedades del objeto
-        setFormLogin({ ...formLogin, [name]: value })
+        setFormRegister({ ...formRegister, [name]: value });
     }
 
-    //función para iniciar sesión
-    const handleSingIn = () => {
-        //Validar que todos los campos estén completos
-        if (!formLogin.email || !formLogin.password) {
+    //función registrar nuevos usuarios 
+    const handleSignUp = () => {
+        //Validando que los campos del formulario no estpen vacíos
+        if (!formRegister.email || !formRegister.password) {
             //Mensaje de aviso
             Alert.alert(
                 'Error',
@@ -52,33 +52,49 @@ export const LoginScreen = ({ users }: Props) => {
             return;
         }
 
-        //Validar que el usuario si exista (usuario registrado)
-        if (!verifyUser()) {
+        //Validando que el usuario no se encuentre registrado
+        if (verifyUser() != null) {
             Alert.alert(
                 'Error',
-                'Correo y/o contraseña incorrecta!'
+                'El correo ya se encuentra registrado!'
             );
             return;
         }
 
-        //Si inicio sesión correctamente ir al Home Screen
-        navigation.dispatch(CommonActions.navigate({ name: 'Home' }));
-        //console.log(formLogin);
+        //Generar la información del nuevo usuario (objeto - User)
+        //Arreglo con los ids del usuario
+        const getIdUsers = users.map(user => user.id); //[1,2]
+        //Generar el id para el nuevo usuario
+        const getNewId = Math.max(...getIdUsers) + 1;
+        // Crear el nuevo usuario - nuevo objeto usuario
+        const newUser: User = {
+            id: getNewId,
+            email: formRegister.email,
+            password: formRegister.password
+        };
+        //Agregando el nuevo usuario al arreglo
+        handleAddUser(newUser);
+        Alert.alert(
+            'Felicitaciones',
+            'Registro exitoso!'
+        );
+        navigation.goBack();
+        //console.log(formRegister);
     }
 
-    //función permitir verificar si el usuario en el arreglo (registrado)
+    //función para validar que el usuario no esté registrado
     const verifyUser = () => {
-        const existUser = users.filter(user => user.email === formLogin.email && user.password === formLogin.password)[0];
-        return existUser; //User | null
+        const existUser = users.filter(user => user.email === formRegister.email)[0];
+        return existUser; // User | null
     }
 
     return (
         <View>
             <StatusBar backgroundColor={PRIMARY_COLOR} />
-            <TitleComponent title='Iniciar Sesión' />
+            <TitleComponent title='Regístrate' />
             <BodyComponent>
                 <View>
-                    <Text style={styles.titleBody}>Bienvenido de nuevo!</Text>
+                    <Text style={styles.titleBody}>Estás muy cerca!</Text>
                     <Text style={styles.descriptionBody}>Realiza tus compras de manera rápida y segura</Text>
                 </View>
                 <View style={styles.contentInputs}>
@@ -94,12 +110,12 @@ export const LoginScreen = ({ users }: Props) => {
                         hasIcon={true}
                         accionIcon={() => setHiddenPassword(!hiddenPassword)} />
                 </View>
-                <ButtonComponent textButton='Iniciar' onPress={handleSingIn} />
+                <ButtonComponent textButton='Registrar' onPress={handleSignUp} />
                 <TouchableOpacity
-                    onPress={() => navigation.dispatch(CommonActions.navigate({ name: 'Register' }))}>
+                    onPress={() => navigation.dispatch(CommonActions.navigate({ name: 'Login' }))}>
                     <Text
                         style={styles.textRedirection}>
-                        No tienes una cuenta? Regístrate ahora
+                        Ya tienes una cuenta? Iniciar sesión ahora
                     </Text>
                 </TouchableOpacity>
             </BodyComponent>
